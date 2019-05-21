@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/FragmentTextView"
+    android:gravity="center_vertical|start"
+    android:textColor="@color/palette_purple"
+    android:text="Purple"
+    android:background="@drawable/dash_frame_purple"/>

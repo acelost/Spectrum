@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/dash_frame_orange">
+
+    <TextView
+        style="@style/FragmentTextView"
+        android:gravity="center_horizontal|bottom"
+        android:textColor="@color/palette_orange"
+        android:text="Orange" />
+
+    <FrameLayout
+        android:id="@+id/child_fragment_container"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_gravity="end|top"/>
+
+</FrameLayout>

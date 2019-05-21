@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="frame_dash_width">16dp</dimen>
+    <dimen name="frame_dash_gap">16dp</dimen>
+    <dimen name="frame_stroke_width">4dp</dimen>
+</resources>

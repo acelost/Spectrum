@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#008577</color>
+    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorAccent">#D81B60</color>
+
+    <color name="palette_green">#43a047</color>
+    <color name="palette_orange">#fb8c00</color>
+    <color name="palette_blue">#1e88e5</color>
+    <color name="palette_purple">#5e35b1</color>
+    <color name="palette_red">#e53935</color>
+    <color name="palette_fade">#20000000</color>
+</resources>

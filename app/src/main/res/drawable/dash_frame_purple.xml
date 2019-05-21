@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/palette_fade"/>
+    <stroke
+        android:dashWidth="@dimen/frame_dash_width"
+        android:dashGap="@dimen/frame_dash_gap"
+        android:width="@dimen/frame_stroke_width"
+        android:color="@color/palette_purple"/>
+</shape>
