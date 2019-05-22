@@ -36,12 +36,27 @@ Now you will see something like this in IDE logcat:
 
 ![](spectrum_logcat_output_example.png)
 
-## How to install
- TODO
+## How to integrate
+
+You can add source file 
+[Spectrum.java][spectrum-java-src] 
+to your project sources if you want to test the library or if you need to use it once.
+This file contains all the basic functionality of the utility.
+
+<img src="insert_directly_to_sources_example.png" width="320">
+
+In order to use the library to its fullest, add new gradle dependency:
+
+```groovy
+implementation 'com.acelost.spectrum:spectrum:0.0.1'
+```
+
 ## How to configure
  TODO
 ## F.A.Q.
- TODO 
+ TODO
+ 
+Do you still have a question? Ask them in Telegram channel [t.me/spectrum_android](t.me/spectrum_android).
 
 ## License
 
@@ -61,3 +76,4 @@ Now you will see something like this in IDE logcat:
     
 [bintray]: https://bintray.com/acelost/Spectrum/spectrum
 [bintraybadge-svg]: https://img.shields.io/bintray/v/acelost/Spectrum/spectrum.svg?maxAge=3600
+[spectrum-java-src]: https://github.com/acelost/Spectrum/blob/master/spectrum/src/main/java/com/acelost/spectrum/Spectrum.java
