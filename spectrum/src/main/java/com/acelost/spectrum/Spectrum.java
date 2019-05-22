@@ -216,15 +216,23 @@ public class Spectrum {
     }
 
     private static void visitView(@NonNull ViewNode node, int level, @NonNull OutputBuilder output) {
+        final View view = node.view;
+        final int visibility = view.getVisibility();
         indent(output, level)
-                .append(node.view instanceof ViewGroup ? "▸[ViewGroup] " : "●[View] ")
-                .append(formatClassLink(node.view));
+                .append(view instanceof ViewGroup
+                        ? visibility == View.VISIBLE ? "▸[ViewGroup] " : "▹[ViewGroup]"
+                        : visibility == View.VISIBLE ? "●[View] " : "○[View] ")
+                .append(formatClassLink(view));
 
         if (Configuration.APPEND_VIEW_LOCATION) {
-            if (node.view.getParent() != null) {
-                final Rect location = new Rect();
-                node.view.getGlobalVisibleRect(location);
-                output.append(" ").append(formatLocation(location));
+            if (view.getParent() != null) {
+                if (visibility == View.GONE) {
+                    output.append(" [gone]");
+                } else {
+                    final Rect location = new Rect();
+                    view.getGlobalVisibleRect(location);
+                    output.append(" ").append(formatLocation(location));
+                }
             } else {
                 output.append(" [out of layout]");
             }
