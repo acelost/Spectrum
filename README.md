@@ -56,7 +56,7 @@ implementation 'com.acelost.spectrum:spectrum:0.0.1'
 ## F.A.Q.
  TODO
  
-Do you still have a question? Ask them in Telegram channel [t.me/spectrum_android](t.me/spectrum_android).
+Do you still have questions? Ask them in Telegram channel [t.me/spectrum_android](t.me/spectrum_android).
 
 ## License
 
