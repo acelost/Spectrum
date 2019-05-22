@@ -1,8 +1,24 @@
+apply plugin: 'com.novoda.bintray-release'
 apply plugin: 'com.android.library'
+
+publish {
+
+    def groupProjectID = 'com.acelost.spectrum'
+    def artifactProjectID = 'spectrum'
+    def publishVersionID = '0.0.1'
+
+    userOrg = 'acelost'
+    repoName = 'Spectrum'
+    groupId = groupProjectID
+    artifactId = artifactProjectID
+    publishVersion = publishVersionID
+    desc = 'Android library for displaying current structure of UI elements such as Activity, Fragment, View.'
+    website = 'https://github.com/acelost/Spectrum'
+
+}
 
 android {
     compileSdkVersion 28
-
 
     defaultConfig {
         minSdkVersion 15
