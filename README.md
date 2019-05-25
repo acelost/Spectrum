@@ -82,6 +82,6 @@ Do you still have questions? Ask them in Telegram group [t.me/spectrum_android][
     limitations under the License.
     
 [bintray]: https://bintray.com/acelost/Spectrum/spectrum
-[bintraybadge-svg]: https://img.shields.io/bintray/v/acelost/Spectrum/spectrum.svg?maxAge=3600
+[bintraybadge-svg]: https://img.shields.io/bintray/v/acelost/Spectrum/spectrum.svg
 [spectrum-java-src]: https://github.com/acelost/Spectrum/blob/master/spectrum/src/main/java/com/acelost/spectrum/Spectrum.java
 [telegram-group]: https://t.me/joinchat/BQAcsRNDjEsjdCEe_F_00w
