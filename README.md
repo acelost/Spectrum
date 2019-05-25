@@ -30,7 +30,14 @@ public void onCreate(Bundle savedInstanceState) {
 }
 ```
 
-Add this line into your `BaseActivity` if you want to inspect all activities.
+Or if you want to inspect all activities add this line into `onCreate` method of your `Application` class:
+
+```java
+public void onCreate() {
+    Spectrum.explore(this);
+    // your perfect code again
+}
+```
 
 Now you will see something like this in IDE logcat:
 
