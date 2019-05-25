@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
@@ -35,6 +36,7 @@ public class Spectrum {
         private static String LOG_TAG = "Spectrum";
         private static int LOG_LEVEL = Log.DEBUG;
         private static boolean APPEND_PACKAGES = false;
+        private static boolean APPEND_VIEW_ID = true;
         private static boolean APPEND_VIEW_LOCATION = false;
         private static boolean SHOW_VIEW_HIERARCHY = true;
         private static boolean PRINT_HIERARCHY_BUILD_TIME = false;
@@ -239,6 +241,20 @@ public class Spectrum {
                         : visibility == View.VISIBLE ? "●[View] " : "○[View] ")
                 .append(formatClassLink(view));
 
+        if (Configuration.APPEND_VIEW_ID) {
+            final int id = view.getId();
+            if (id != View.NO_ID && !isViewIdGenerated(id)) {
+                try {
+                    final String idName = view.getResources().getResourceEntryName(id);
+                    if (idName != null) {
+                        output.append(" [id/").append(idName).append("]");
+                    }
+                } catch (Resources.NotFoundException e) {
+                    Log.w(Configuration.LOG_TAG, "Failed to obtain view id name. Possibly id was manually generated.");
+                }
+            }
+        }
+
         if (Configuration.APPEND_VIEW_LOCATION) {
             if (view.getParent() != null) {
                 if (visibility == View.GONE) {
@@ -273,7 +289,7 @@ public class Spectrum {
                                 : "□[Fragment(out-of-layout)] ")
                 .append(formatClassLink(node.fragment));
         if (node.fragment.getTag() != null) {
-            output.append(" \\ \'").append(node.fragment.getTag()).append("\'");
+            output.append(" [tag \'").append(node.fragment.getTag()).append("\']");
         }
         output.newline();
 
@@ -475,6 +491,11 @@ public class Spectrum {
 
     private static boolean isMainThread() {
         return Looper.myLooper() == Looper.getMainLooper();
+    }
+
+    // Copy of internal View's class method
+    private static boolean isViewIdGenerated(int id) {
+        return (id & 0xFF000000) == 0 && (id & 0x00FFFFFF) != 0;
     }
 
     // endregion
@@ -831,6 +852,12 @@ public class Spectrum {
         @NonNull
         public Configurator appendPackages(boolean append) {
             Configuration.APPEND_PACKAGES = append;
+            return this;
+        }
+
+        @NonNull
+        public Configurator appendViewId(boolean append) {
+            Configuration.APPEND_VIEW_ID = append;
             return this;
         }
 
