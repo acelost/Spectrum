@@ -40,14 +40,15 @@ public class Spectrum {
         private static boolean APPEND_VIEW_LOCATION = false;
         private static boolean SHOW_VIEW_HIERARCHY = true;
         private static boolean PRINT_HIERARCHY_BUILD_TIME = false;
-        private static boolean THROTTLE_REPORTING = true;
-        private static int THROTTLE_REPORTING_MS = 500;
+        private static boolean SAMPLE_REPORTING = true;
+        private static int SAMPLE_REPORTING_MS = 500;
     }
 
     private static final String OUTPUT_HORIZONTAL_DIVIDER =     "――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――\n";
     private static final String TITLE_SPECTRUM_STATE_REPORT =   "                                          SPECTRUM REPORT                                           \n";
     private static final String HEADER_HIERARCHY = "HIERARCHY:\n";
     private static final String HEADER_CHANGES = "CHANGES:\n";
+
     private static final int LOGCAT_BUFFER_SIZE = 4000;
 
     private static boolean initialized = false;
@@ -167,11 +168,11 @@ public class Spectrum {
             // Append change to pending only if it distinct from last
             pendingChanges.add(changeDescription);
         }
-        if (Configuration.THROTTLE_REPORTING) {
+        if (Configuration.SAMPLE_REPORTING) {
             final long now = System.currentTimeMillis();
             if (scheduledReportTime < now) {
                 // There shouldn't be scheduled reporting, schedule it right now
-                scheduleReporting(Configuration.THROTTLE_REPORTING_MS);
+                scheduleReporting(Configuration.SAMPLE_REPORTING_MS);
             }
         } else {
             report();
@@ -189,14 +190,15 @@ public class Spectrum {
     }
 
     @NonNull
-    private static List<String> buildReport(@NonNull ApplicationStateTree tree, long buildTime) {
+    private static List<String> buildReport(@NonNull ApplicationStateTree tree, long buildTimeNs) {
         final OutputBuilder output = new OutputBuilder()
                 .append(Configuration.PRINT_HIERARCHY_BUILD_TIME
-                        ? String.format(Locale.getDefault(), "Report built in %.1f ms\n", buildTime / 1000000f)
+                        ? String.format(Locale.getDefault(), "Report built in %.1f ms\n", buildTimeNs / 1000000f)
                         : " \n")
                 .append(OUTPUT_HORIZONTAL_DIVIDER)
                 .append(TITLE_SPECTRUM_STATE_REPORT)
                 .append(HEADER_HIERARCHY);
+
         for (ActivityNode activityNode : tree.activities) {
             visitActivity(activityNode, output);
         }
@@ -643,7 +645,7 @@ public class Spectrum {
         }
 
         private void notifyStateChanged() {
-            notifyChangesDetected(activity.getClass().getName() + " " + state);
+            notifyChangesDetected(formatClassLink(activity) + " " + state);
         }
     }
 
@@ -655,13 +657,13 @@ public class Spectrum {
             final String parent = parentFragment != null
                     ? parentFragment.getClass().getName()
                     : context.getClass().getName();
-            notifyChangesDetected(f.getClass().getName() + " attached to " + parent);
+            notifyChangesDetected(formatClassLink(f) + " attached to " + parent);
         }
 
         @Override
         public void onFragmentDetached(@NonNull FragmentManager fm, @NonNull Fragment f) {
             super.onFragmentDetached(fm, f);
-            notifyChangesDetected(f.getClass().getName() + " detached");
+            notifyChangesDetected(formatClassLink(f) + " detached");
         }
     }
 
@@ -862,7 +864,7 @@ public class Spectrum {
         }
 
         @NonNull
-        public Configurator appendViewLocations(boolean append) {
+        public Configurator appendViewLocation(boolean append) {
             Configuration.APPEND_VIEW_LOCATION = append;
             return this;
         }
@@ -874,8 +876,8 @@ public class Spectrum {
         }
 
         @NonNull
-        public Configurator throttleReporting(boolean throttle) {
-            Configuration.THROTTLE_REPORTING = throttle;
+        public Configurator sampleReporting(boolean throttle) {
+            Configuration.SAMPLE_REPORTING = throttle;
             return this;
         }
 
