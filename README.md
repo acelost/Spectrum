@@ -63,7 +63,7 @@ implementation 'com.acelost.spectrum:spectrum:0.0.1'
 ## F.A.Q.
  TODO
  
-Do you still have questions? Ask them in Telegram channel [t.me/spectrum_android][telegram-channel].
+Do you still have questions? Ask them in Telegram group [t.me/spectrum_android][telegram-group].
 
 ## License
 
@@ -84,4 +84,4 @@ Do you still have questions? Ask them in Telegram channel [t.me/spectrum_android
 [bintray]: https://bintray.com/acelost/Spectrum/spectrum
 [bintraybadge-svg]: https://img.shields.io/bintray/v/acelost/Spectrum/spectrum.svg?maxAge=3600
 [spectrum-java-src]: https://github.com/acelost/Spectrum/blob/master/spectrum/src/main/java/com/acelost/spectrum/Spectrum.java
-[telegram-channel]: https://t.me/spectrum_android
+[telegram-group]: https://t.me/joinchat/BQAcsRNDjEsjdCEe_F_00w
