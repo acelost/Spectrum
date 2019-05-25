@@ -15,7 +15,7 @@ abstract class SpectrumActivity : AppCompatActivity() {
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        Spectrum.explore(this)
+        //Spectrum.explore(this)
         super.onCreate(savedInstanceState)
     }
 

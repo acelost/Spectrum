@@ -2,13 +2,16 @@ package com.acelost.spectrum;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.graphics.Rect;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
 import java.lang.annotation.Annotation;
+import java.lang.ref.WeakReference;
 import java.util.*;
 
 import android.view.View;
@@ -47,7 +50,11 @@ public class Spectrum {
 
     private static boolean initialized = false;
 
+    private static WeakReference<Application> applicationRef;
+
     private static WeakHashMap<Activity, Long> activities;
+
+    private static ApplicationObserver applicationObserver;
 
     private static List<ActivityObserver> activityObservers;
 
@@ -83,6 +90,21 @@ public class Spectrum {
             }
         }
         return true;
+    }
+
+    public static void explore(@NonNull Application application) {
+        if (!prepare()) return;
+        final Application observing = applicationRef != null ? applicationRef.get() : null;
+        if (observing != application) {
+            if (observing != null) {
+                observing.unregisterActivityLifecycleCallbacks(applicationObserver);
+            }
+            if (applicationObserver == null) {
+                applicationObserver = new ApplicationObserver();
+            }
+            applicationRef = new WeakReference<>(application);
+            application.registerActivityLifecycleCallbacks(applicationObserver);
+        }
     }
 
     public static void explore(@NonNull Activity activity) {
@@ -173,13 +195,6 @@ public class Spectrum {
                 .append(OUTPUT_HORIZONTAL_DIVIDER)
                 .append(TITLE_SPECTRUM_STATE_REPORT)
                 .append(HEADER_HIERARCHY);
-        /*final StringBuilder output = new StringBuilder(
-                Configuration.PRINT_HIERARCHY_BUILD_TIME
-                        ? String.format(Locale.getDefault(), "Report built in %.1f ms\n", buildTime / 1000000f)
-                        : " \n")
-                .append(OUTPUT_HORIZONTAL_DIVIDER)
-                .append(TITLE_SPECTRUM_STATE_REPORT)
-                .append(HEADER_HIERARCHY);*/
         for (ActivityNode activityNode : tree.activities) {
             visitActivity(activityNode, output);
         }
@@ -518,6 +533,32 @@ public class Spectrum {
     // endregion
 
     // region Entity Observers
+
+    private static class ApplicationObserver implements Application.ActivityLifecycleCallbacks {
+
+        @Override
+        public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+            explore(activity);
+        }
+
+        @Override
+        public void onActivityStarted(Activity activity) { /* no-op */ }
+
+        @Override
+        public void onActivityResumed(Activity activity) { /* no-op */ }
+
+        @Override
+        public void onActivityPaused(Activity activity) { /* no-op */ }
+
+        @Override
+        public void onActivityStopped(Activity activity) { /* no-op */ }
+
+        @Override
+        public void onActivitySaveInstanceState(Activity activity, Bundle outState) { /* no-op */ }
+
+        @Override
+        public void onActivityDestroyed(Activity activity) { /* no-op */ }
+    }
 
     @SuppressWarnings("unused")
     private static class ActivityObserver implements LifecycleObserver {
