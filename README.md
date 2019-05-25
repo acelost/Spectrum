@@ -89,59 +89,59 @@ Or you can apply configuration via resources:
 Complete list of configuration parameters:
 1. Log tag - log tag you want to use for output:
 
-⋅⋅* <i>java:</i> logTag(`String` tag);
+    * <i><b>java:</b></i>&nbsp;&nbsp;&nbsp;logTag(`String` tag);
 
-⋅⋅* <i>xml:</i> \<string name="`spectrum_log_tag`">...\</string>
+    * <i><b>xml:</b></i>&nbsp;&nbsp;&nbsp;\<string name="`spectrum_log_tag`">...\</string>
 
-⋅⋅* <i>default:</i> "Spectrum"
+    * <i><b>default:&nbsp;&nbsp;&nbsp;</b></i> "Spectrum"
 
 2. Log level - log level you want to use for output (see valid values in `android.util.Log` class):
 
-⋅⋅* <i>java:</i> logLevel(`int` level);
+    * <i><b>java:</b></i>&nbsp;&nbsp;&nbsp;logLevel(`int` level);
 
-⋅⋅* <i>xml:</i> \<integer name="`spectrum_log_level`">...\</integer>
+    * <i><b>xml:</b></i>&nbsp;&nbsp;&nbsp;\<integer name="`spectrum_log_level`">...\</integer>
 
-⋅⋅* <i>default:</i> Log.DEBUG // 3
+    * <i><b>default:</b></i>&nbsp;&nbsp;&nbsp;Log.DEBUG // 3
 
 3. Show view hierarchy - whether to display view hierarchy or not:
 
-⋅⋅* <i>java:</i> showViewHierarchy(`boolean` show);
+    * <i><b>java:</b></i>&nbsp;&nbsp;&nbsp;showViewHierarchy(`boolean` show);
 
-⋅⋅* <i>xml:</i> \<bool name="`spectrum_show_view_hierarchy`">...\</bool>
+    * <i><b>xml:</b></i>&nbsp;&nbsp;&nbsp;\<bool name="`spectrum_show_view_hierarchy`">...\</bool>
 
-⋅⋅* <i>default:</i> "Spectrum"
+    * <i><b>default:</b></i>&nbsp;&nbsp;&nbsp;True
 
 4. Append packages - whether to append package to class name or not:
 
-⋅⋅* <i>java:</i> showViewHierarchy(`boolean` show);
+    * <i><b>java:</b></i>&nbsp;&nbsp;&nbsp;showViewHierarchy(`boolean` show);
 
-⋅⋅* <i>xml:</i> \<bool name="`spectrum_append_packages`">...\</bool>
+    * <i><b>xml:</b></i>&nbsp;&nbsp;&nbsp;\<bool name="`spectrum_append_packages`">...\</bool>
 
-⋅⋅* <i>default:</i> False
+    * <i><b>default:</b></i>&nbsp;&nbsp;&nbsp;False
 
 5. Append view id - whether to append id to `View` nodes in hierarchy or not:
 
-⋅⋅* <i>java:</i> appendViewId(`boolean` append);
+    * <i><b>java:</b></i>&nbsp;&nbsp;&nbsp;appendViewId(`boolean` append);
 
-⋅⋅* <i>xml:</i> \<bool name="`spectrum_append_view_id`">...\</bool>
+    * <i><b>xml:</b></i>&nbsp;&nbsp;&nbsp;\<bool name="`spectrum_append_view_id`">...\</bool>
 
-⋅⋅* <i>default:</i> True
+    * <i><b>default:</b></i>&nbsp;&nbsp;&nbsp;True
 
 6. Append view location - whether to append location on screen to `View` nodes in hierarchy or not:
 
-⋅⋅* <i>java:</i> appendViewLocation(`boolean` append);
+    * <i><b>java:</b></i>&nbsp;&nbsp;&nbsp;appendViewLocation(`boolean` append);
 
-⋅⋅* <i>xml:</i> \<bool name="`spectrum_append_view_location`">...\</bool>
+    * <i><b>xml:</b></i>&nbsp;&nbsp;&nbsp;\<bool name="`spectrum_append_view_location`">...\</bool>
 
-⋅⋅* <i>default:</i> False
+    * <i><b>default:</b></i>&nbsp;&nbsp;&nbsp;False
 
 7. Sample reporting - whether to sample reporting or build new report after any changes:
 
-⋅⋅* <i>java:</i> sampleReporting(`boolean` sample);
+    * <i><b>java:</b></i>&nbsp;&nbsp;&nbsp;sampleReporting(`boolean` sample);
 
-⋅⋅* <i>xml:</i> \<bool name="`spectrum_sample_reporting`">...\</bool>
+    * <i><b>xml:</b></i>&nbsp;&nbsp;&nbsp;\<bool name="`spectrum_sample_reporting`">...\</bool>
 
-⋅⋅* <i>default:</i> True
+    * <i><b>default:</b></i>&nbsp;&nbsp;&nbsp;True
 
 ## F.A.Q.
  TODO
