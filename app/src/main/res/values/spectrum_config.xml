@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="spectrum_log_tag">MyCustomTag</string>
+    <integer name="spectrum_log_level">5</integer>
+    <bool name="spectrum_show_view_hierarchy">true</bool>
+    <bool name="spectrum_append_packages">false</bool>
+    <bool name="spectrum_append_view_id">true</bool>
+    <bool name="spectrum_append_view_location">true</bool>
+    <bool name="spectrum_sample_reporting">false</bool>
+</resources>
