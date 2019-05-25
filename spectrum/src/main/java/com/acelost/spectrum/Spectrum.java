@@ -39,7 +39,6 @@ public class Spectrum {
         private static boolean APPEND_VIEW_ID = true;
         private static boolean APPEND_VIEW_LOCATION = false;
         private static boolean SHOW_VIEW_HIERARCHY = true;
-        private static boolean PRINT_HIERARCHY_BUILD_TIME = false;
         private static boolean SAMPLE_REPORTING = true;
         private static int SAMPLE_REPORTING_MS = 500;
     }
@@ -70,7 +69,7 @@ public class Spectrum {
     private static long scheduledReportTime = 0;
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    private static boolean prepare() {
+    private static boolean prepare(@NonNull Context context) {
         if (!BuildConfig.DEBUG) {
             // Disable spectrum for release builds
             return false;
@@ -88,6 +87,7 @@ public class Spectrum {
                             report();
                         }
                     };
+                    parseConfigFromResources(context);
                     initialized = true;
                 }
             }
@@ -95,8 +95,49 @@ public class Spectrum {
         return true;
     }
 
+    private static void parseConfigFromResources(@NonNull Context context) {
+        int id;
+        if ((id = getStringResId(context, "spectrum_log_tag")) != 0) {
+            Configuration.LOG_TAG = context.getString(id);
+        }
+        if ((id = getIntResId(context, "spectrum_log_level")) != 0) {
+            Configuration.LOG_LEVEL = context.getResources().getInteger(id);
+        }
+        if ((id = getBoolResId(context, "spectrum_append_packages")) != 0) {
+            Configuration.APPEND_PACKAGES = context.getResources().getBoolean(id);
+        }
+        if ((id = getBoolResId(context, "spectrum_append_view_id")) != 0) {
+            Configuration.APPEND_VIEW_ID = context.getResources().getBoolean(id);
+        }
+        if ((id = getBoolResId(context, "spectrum_append_view_location")) != 0) {
+            Configuration.APPEND_VIEW_LOCATION = context.getResources().getBoolean(id);
+        }
+        if ((id = getBoolResId(context, "spectrum_show_view_hierarchy")) != 0) {
+            Configuration.SHOW_VIEW_HIERARCHY = context.getResources().getBoolean(id);
+        }
+        if ((id = getBoolResId(context, "spectrum_sample_reporting")) != 0) {
+            Configuration.SAMPLE_REPORTING = context.getResources().getBoolean(id);
+        }
+    }
+
+    private static int getStringResId(@NonNull Context context, @NonNull String name) {
+        return getResId(context, name, "string");
+    }
+
+    private static int getIntResId(@NonNull Context context, @NonNull String name) {
+        return getResId(context, name, "integer");
+    }
+
+    private static int getBoolResId(@NonNull Context context, @NonNull String name) {
+        return getResId(context, name, "bool");
+    }
+
+    private static int getResId(@NonNull Context context, @NonNull String name, @NonNull String defType) {
+        return context.getResources().getIdentifier(name, defType, context.getPackageName());
+    }
+
     public static void explore(@NonNull Application application) {
-        if (!prepare()) return;
+        if (!prepare(application)) return;
         final Application observing = applicationRef != null ? applicationRef.get() : null;
         if (observing != application) {
             if (observing != null) {
@@ -111,7 +152,7 @@ public class Spectrum {
     }
 
     public static void explore(@NonNull Activity activity) {
-        if (!prepare()) return;
+        if (!prepare(activity)) return;
         if (activities.containsKey(activity)) return;
 
         activities.put(activity, null);
@@ -139,7 +180,7 @@ public class Spectrum {
     // region Schedule Reporting
 
     public static void report() {
-        if (!prepare()) return;
+        if (!initialized) return;
         if (!isMainThread()) {
             // Redirect reporting to main thread
             scheduleReporting(0);
@@ -192,9 +233,7 @@ public class Spectrum {
     @NonNull
     private static List<String> buildReport(@NonNull ApplicationStateTree tree, long buildTimeNs) {
         final OutputBuilder output = new OutputBuilder()
-                .append(Configuration.PRINT_HIERARCHY_BUILD_TIME
-                        ? String.format(Locale.getDefault(), "Report built in %.1f ms\n", buildTimeNs / 1000000f)
-                        : " \n")
+                .append(String.format(Locale.getDefault(), "Report built in %.1f ms\n", buildTimeNs / 1000000f))
                 .append(OUTPUT_HORIZONTAL_DIVIDER)
                 .append(TITLE_SPECTRUM_STATE_REPORT)
                 .append(HEADER_HIERARCHY);
@@ -876,8 +915,8 @@ public class Spectrum {
         }
 
         @NonNull
-        public Configurator sampleReporting(boolean throttle) {
-            Configuration.SAMPLE_REPORTING = throttle;
+        public Configurator sampleReporting(boolean sample) {
+            Configuration.SAMPLE_REPORTING = sample;
             return this;
         }
 
