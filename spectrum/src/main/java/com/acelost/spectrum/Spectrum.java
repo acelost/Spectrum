@@ -30,9 +30,20 @@ import androidx.lifecycle.LifecycleObserver;
 import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.OnLifecycleEvent;
 
+/**
+ * Utility for UI state monitoring. Prints current application state in logcat.
+ *
+ * To start monitoring concrete activity use {@link #explore(Activity)}.
+ * To start monitoring all activities use {@link #explore(Application)}.
+ * To configure output call {@link #configure()} and setup Spectrum in builder style.
+ */
 public class Spectrum {
 
-    private static class Configuration {
+    /**
+     * Spectrum configuration delegate.
+     */
+    public static class Configuration {
+
         private static String LOG_TAG = "Spectrum";
         private static int LOG_LEVEL = Log.DEBUG;
         private static boolean APPEND_PACKAGES = false;
@@ -41,6 +52,110 @@ public class Spectrum {
         private static boolean SHOW_VIEW_HIERARCHY = true;
         private static boolean SAMPLE_REPORTING = true;
         private static int SAMPLE_REPORTING_MS = 500;
+
+        /**
+         * Set log tag you want to use for output.
+         */
+        @NonNull
+        public Configuration logTag(@NonNull String tag) {
+            Configuration.LOG_TAG = tag;
+            return this;
+        }
+
+        /**
+         * Set log level you want to use for output (see valid values in {@link Log} class).
+         */
+        @NonNull
+        public Configuration logLevel(int level) {
+            Configuration.LOG_LEVEL = level;
+            return this;
+        }
+
+        /**
+         * Whether to append packages to class name or not.
+         */
+        @NonNull
+        public Configuration appendPackages(boolean append) {
+            Configuration.APPEND_PACKAGES = append;
+            return this;
+        }
+
+        /**
+         * Whether to append view id to {@link View} nodes.
+         */
+        @NonNull
+        public Configuration appendViewId(boolean append) {
+            Configuration.APPEND_VIEW_ID = append;
+            return this;
+        }
+
+        /**
+         * Whether to append view location to {@link View} nodes.
+         */
+        @NonNull
+        public Configuration appendViewLocation(boolean append) {
+            Configuration.APPEND_VIEW_LOCATION = append;
+            return this;
+        }
+
+        /**
+         * Whether to display view hierarchy.
+         */
+        @NonNull
+        public Configuration showViewHierarchy(boolean show) {
+            Configuration.SHOW_VIEW_HIERARCHY = show;
+            return this;
+        }
+
+        /**
+         * Whether to sample reporting or build new report after any changes.
+         */
+        @NonNull
+        public Configuration sampleReporting(boolean sample) {
+            Configuration.SAMPLE_REPORTING = sample;
+            return this;
+        }
+
+        private static void parseConfigFromResources(@NonNull Context context) {
+            int id;
+            if ((id = getStringResId(context, "spectrum_log_tag")) != 0) {
+                Configuration.LOG_TAG = context.getString(id);
+            }
+            if ((id = getIntResId(context, "spectrum_log_level")) != 0) {
+                Configuration.LOG_LEVEL = context.getResources().getInteger(id);
+            }
+            if ((id = getBoolResId(context, "spectrum_append_packages")) != 0) {
+                Configuration.APPEND_PACKAGES = context.getResources().getBoolean(id);
+            }
+            if ((id = getBoolResId(context, "spectrum_append_view_id")) != 0) {
+                Configuration.APPEND_VIEW_ID = context.getResources().getBoolean(id);
+            }
+            if ((id = getBoolResId(context, "spectrum_append_view_location")) != 0) {
+                Configuration.APPEND_VIEW_LOCATION = context.getResources().getBoolean(id);
+            }
+            if ((id = getBoolResId(context, "spectrum_show_view_hierarchy")) != 0) {
+                Configuration.SHOW_VIEW_HIERARCHY = context.getResources().getBoolean(id);
+            }
+            if ((id = getBoolResId(context, "spectrum_sample_reporting")) != 0) {
+                Configuration.SAMPLE_REPORTING = context.getResources().getBoolean(id);
+            }
+        }
+
+        private static int getStringResId(@NonNull Context context, @NonNull String name) {
+            return getResId(context, name, "string");
+        }
+
+        private static int getIntResId(@NonNull Context context, @NonNull String name) {
+            return getResId(context, name, "integer");
+        }
+
+        private static int getBoolResId(@NonNull Context context, @NonNull String name) {
+            return getResId(context, name, "bool");
+        }
+
+        private static int getResId(@NonNull Context context, @NonNull String name, @NonNull String defType) {
+            return context.getResources().getIdentifier(name, defType, context.getPackageName());
+        }
     }
 
     private static final String OUTPUT_HORIZONTAL_DIVIDER =     "――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――\n";
@@ -68,74 +183,9 @@ public class Spectrum {
 
     private static long scheduledReportTime = 0;
 
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    private static boolean prepare(@NonNull Context context) {
-        if (!BuildConfig.DEBUG) {
-            // Disable spectrum for release builds
-            return false;
-        }
-        if (!initialized) {
-            synchronized (Spectrum.class) {
-                if (!initialized) {
-                    activities = new WeakHashMap<>();
-                    activityObservers = new ArrayList<>();
-                    handler = new Handler(Looper.getMainLooper());
-                    pendingChanges = new ArrayList<>();
-                    reportRunnable = new Runnable() {
-                        @Override
-                        public void run() {
-                            report();
-                        }
-                    };
-                    parseConfigFromResources(context);
-                    initialized = true;
-                }
-            }
-        }
-        return true;
-    }
-
-    private static void parseConfigFromResources(@NonNull Context context) {
-        int id;
-        if ((id = getStringResId(context, "spectrum_log_tag")) != 0) {
-            Configuration.LOG_TAG = context.getString(id);
-        }
-        if ((id = getIntResId(context, "spectrum_log_level")) != 0) {
-            Configuration.LOG_LEVEL = context.getResources().getInteger(id);
-        }
-        if ((id = getBoolResId(context, "spectrum_append_packages")) != 0) {
-            Configuration.APPEND_PACKAGES = context.getResources().getBoolean(id);
-        }
-        if ((id = getBoolResId(context, "spectrum_append_view_id")) != 0) {
-            Configuration.APPEND_VIEW_ID = context.getResources().getBoolean(id);
-        }
-        if ((id = getBoolResId(context, "spectrum_append_view_location")) != 0) {
-            Configuration.APPEND_VIEW_LOCATION = context.getResources().getBoolean(id);
-        }
-        if ((id = getBoolResId(context, "spectrum_show_view_hierarchy")) != 0) {
-            Configuration.SHOW_VIEW_HIERARCHY = context.getResources().getBoolean(id);
-        }
-        if ((id = getBoolResId(context, "spectrum_sample_reporting")) != 0) {
-            Configuration.SAMPLE_REPORTING = context.getResources().getBoolean(id);
-        }
-    }
-
-    private static int getStringResId(@NonNull Context context, @NonNull String name) {
-        return getResId(context, name, "string");
-    }
-
-    private static int getIntResId(@NonNull Context context, @NonNull String name) {
-        return getResId(context, name, "integer");
-    }
-
-    private static int getBoolResId(@NonNull Context context, @NonNull String name) {
-        return getResId(context, name, "bool");
-    }
-
-    private static int getResId(@NonNull Context context, @NonNull String name, @NonNull String defType) {
-        return context.getResources().getIdentifier(name, defType, context.getPackageName());
-    }
-
+    /**
+     * Start monitoring of application.
+     */
     public static void explore(@NonNull Application application) {
         if (!prepare(application)) return;
         final Application observing = applicationRef != null ? applicationRef.get() : null;
@@ -151,6 +201,9 @@ public class Spectrum {
         }
     }
 
+    /**
+     * Start monitoring of activity.
+     */
     public static void explore(@NonNull Activity activity) {
         if (!prepare(activity)) return;
         if (activities.containsKey(activity)) return;
@@ -172,9 +225,39 @@ public class Spectrum {
         }
     }
 
+    /**
+     * Configure state output.
+     */
     @NonNull
-    public static Configurator configure() {
-        return new Configurator();
+    public static Configuration configure() {
+        return new Configuration();
+    }
+
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    private static boolean prepare(@NonNull Context context) {
+        if (!BuildConfig.DEBUG) {
+            // Disable spectrum for release builds
+            return false;
+        }
+        if (!initialized) {
+            synchronized (Spectrum.class) {
+                if (!initialized) {
+                    activities = new WeakHashMap<>();
+                    activityObservers = new ArrayList<>();
+                    handler = new Handler(Looper.getMainLooper());
+                    pendingChanges = new ArrayList<>();
+                    reportRunnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            report();
+                        }
+                    };
+                    Configuration.parseConfigFromResources(context);
+                    initialized = true;
+                }
+            }
+        }
+        return true;
     }
 
     // region Schedule Reporting
@@ -866,58 +949,6 @@ public class Spectrum {
             messages.add(message);
             message = new StringBuilder(" \n");
             messageBytes = 0;
-        }
-
-    }
-
-    // endregion
-
-    // region Configurator
-
-    public static class Configurator {
-
-        private Configurator() { }
-
-        @NonNull
-        public Configurator logTag(@NonNull String tag) {
-            Configuration.LOG_TAG = tag;
-            return this;
-        }
-
-        @NonNull
-        public Configurator logLevel(int level) {
-            Configuration.LOG_LEVEL = level;
-            return this;
-        }
-
-        @NonNull
-        public Configurator appendPackages(boolean append) {
-            Configuration.APPEND_PACKAGES = append;
-            return this;
-        }
-
-        @NonNull
-        public Configurator appendViewId(boolean append) {
-            Configuration.APPEND_VIEW_ID = append;
-            return this;
-        }
-
-        @NonNull
-        public Configurator appendViewLocation(boolean append) {
-            Configuration.APPEND_VIEW_LOCATION = append;
-            return this;
-        }
-
-        @NonNull
-        public Configurator showViewHierarchy(boolean show) {
-            Configuration.SHOW_VIEW_HIERARCHY = show;
-            return this;
-        }
-
-        @NonNull
-        public Configurator sampleReporting(boolean sample) {
-            Configuration.SAMPLE_REPORTING = sample;
-            return this;
         }
 
     }

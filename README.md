@@ -55,7 +55,7 @@ This file contains all the basic functionality of the utility.
 In order to use the library to its fullest, add new gradle dependency:
 
 ```groovy
-implementation 'com.acelost.spectrum:spectrum:0.0.1'
+implementation 'com.acelost.spectrum:spectrum:0.0.2'
 ```
 
 ## How to configure
