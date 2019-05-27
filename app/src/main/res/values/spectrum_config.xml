@@ -6,5 +6,6 @@
     <bool name="spectrum_append_packages">false</bool>
     <bool name="spectrum_append_view_id">true</bool>
     <bool name="spectrum_append_view_location">true</bool>
+    <bool name="spectrum_auto_reporting">false</bool>
     <bool name="spectrum_sample_reporting">false</bool>
 </resources>

@@ -35,6 +35,7 @@ import androidx.lifecycle.OnLifecycleEvent;
  *
  * To start monitoring concrete activity use {@link #explore(Activity)}.
  * To start monitoring all activities use {@link #explore(Application)}.
+ * To start building a report manually call {@link #report()}.
  * To configure output call {@link #configure()} and setup Spectrum in builder style.
  */
 public class Spectrum {
@@ -50,6 +51,7 @@ public class Spectrum {
         private static boolean APPEND_VIEW_ID = true;
         private static boolean APPEND_VIEW_LOCATION = false;
         private static boolean SHOW_VIEW_HIERARCHY = true;
+        private static boolean AUTO_REPORTING = true;
         private static boolean SAMPLE_REPORTING = true;
         private static int SAMPLE_REPORTING_MS = 500;
 
@@ -108,6 +110,15 @@ public class Spectrum {
         }
 
         /**
+         * Whether to trigger building report automatically after any changes.
+         */
+        @NonNull
+        public Configuration autoReporting(boolean enable) {
+            Configuration.AUTO_REPORTING = enable;
+            return this;
+        }
+
+        /**
          * Whether to sample reporting or build new report after any changes.
          */
         @NonNull
@@ -135,6 +146,9 @@ public class Spectrum {
             }
             if ((id = getBoolResId(context, "spectrum_show_view_hierarchy")) != 0) {
                 Configuration.SHOW_VIEW_HIERARCHY = context.getResources().getBoolean(id);
+            }
+            if ((id = getBoolResId(context, "spectrum_auto_reporting")) != 0) {
+                Configuration.AUTO_REPORTING = context.getResources().getBoolean(id);
             }
             if ((id = getBoolResId(context, "spectrum_sample_reporting")) != 0) {
                 Configuration.SAMPLE_REPORTING = context.getResources().getBoolean(id);
@@ -262,6 +276,9 @@ public class Spectrum {
 
     // region Schedule Reporting
 
+    /**
+     * Trigger building a report manually.
+     */
     public static void report() {
         if (!initialized) return;
         if (!isMainThread()) {
@@ -292,14 +309,17 @@ public class Spectrum {
             // Append change to pending only if it distinct from last
             pendingChanges.add(changeDescription);
         }
-        if (Configuration.SAMPLE_REPORTING) {
-            final long now = System.currentTimeMillis();
-            if (scheduledReportTime < now) {
-                // There shouldn't be scheduled reporting, schedule it right now
-                scheduleReporting(Configuration.SAMPLE_REPORTING_MS);
+        // Schedule building report if auto reporting enabled
+        if (Configuration.AUTO_REPORTING) {
+            if (Configuration.SAMPLE_REPORTING) {
+                final long now = System.currentTimeMillis();
+                if (scheduledReportTime < now) {
+                    // There shouldn't be scheduled reporting, schedule it right now
+                    scheduleReporting(Configuration.SAMPLE_REPORTING_MS);
+                }
+            } else {
+                report();
             }
-        } else {
-            report();
         }
     }
 

@@ -43,6 +43,15 @@ Now you will see something like this in IDE logcat:
 
 ![](spectrum_logcat_output_example.png)
 
+To start building a report manually call static method `report`:
+
+```java
+// moment to build new Spectrum report
+public void onBuildNewReport() {
+    Spectrum.report();
+}
+```
+
 ## How to integrate
 
 You can add source file 
@@ -86,7 +95,8 @@ Or you can apply configuration via resources:
 </resources>
 ```
 
-Complete list of configuration parameters:
+Complete list of configuration options:
+
 1. Log tag - log tag you want to use for output:
 
     * <i><b>java:</b></i>&nbsp;&nbsp;&nbsp;logTag(`String` tag);
@@ -134,8 +144,16 @@ Complete list of configuration parameters:
     * <i><b>xml:</b></i>&nbsp;&nbsp;&nbsp;\<bool name="`spectrum_append_view_location`">...\</bool>
 
     * <i><b>default:</b></i>&nbsp;&nbsp;&nbsp;False
+    
+7. Auto reporting - whether to trigger building report automatically after any changes:
 
-7. Sample reporting - whether to sample reporting or build new report after any changes:
+    * <i><b>java:</b></i>&nbsp;&nbsp;&nbsp;autoReporting(`boolean` enable);
+
+    * <i><b>xml:</b></i>&nbsp;&nbsp;&nbsp;\<bool name="`spectrum_auto_reporting`">...\</bool>
+
+    * <i><b>default:</b></i>&nbsp;&nbsp;&nbsp;True
+
+8. Sample reporting - whether to sample reporting or build new report after any changes:
 
     * <i><b>java:</b></i>&nbsp;&nbsp;&nbsp;sampleReporting(`boolean` sample);
 
