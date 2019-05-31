@@ -343,8 +343,12 @@ public class Spectrum {
 
     private static void print(@NonNull List<String> messages) {
         for (String message : messages) {
-            Log.println(Configuration.LOG_LEVEL, Configuration.LOG_TAG, message);
+            print(message);
         }
+    }
+
+    private static void print(@NonNull String message) {
+        Log.println(Configuration.LOG_LEVEL, Configuration.LOG_TAG, message);
     }
 
     @NonNull
@@ -1042,6 +1046,7 @@ public class Spectrum {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 if (detectDoubleTap(event)) {
                     taps = 0;
+                    print("Trigger Spectrum report by double tap gesture");
                     report();
                 }
             }
