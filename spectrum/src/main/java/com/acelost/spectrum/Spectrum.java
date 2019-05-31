@@ -15,10 +15,8 @@ import java.lang.annotation.Annotation;
 import java.lang.ref.WeakReference;
 import java.util.*;
 
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.ViewParent;
-import android.view.ViewTreeObserver;
+import android.util.TypedValue;
+import android.view.*;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
@@ -52,6 +50,7 @@ public class Spectrum {
         private static boolean APPEND_VIEW_LOCATION = false;
         private static boolean SHOW_VIEW_HIERARCHY = true;
         private static boolean AUTO_REPORTING = true;
+        private static boolean GESTURE_REPORTING_ENABLED = true;
         private static boolean SAMPLE_REPORTING = true;
         private static int SAMPLE_REPORTING_MS = 500;
 
@@ -119,6 +118,15 @@ public class Spectrum {
         }
 
         /**
+         * Whether to trigger building report when user double taps.
+         */
+        @NonNull
+        public Configuration gestureReporting(boolean enable) {
+            Configuration.GESTURE_REPORTING_ENABLED = enable;
+            return this;
+        }
+
+        /**
          * Whether to sample reporting or build new report after any changes.
          */
         @NonNull
@@ -149,6 +157,9 @@ public class Spectrum {
             }
             if ((id = getBoolResId(context, "spectrum_auto_reporting")) != 0) {
                 Configuration.AUTO_REPORTING = context.getResources().getBoolean(id);
+            }
+            if ((id = getBoolResId(context, "spectrum_gesture_reporting")) != 0) {
+                Configuration.GESTURE_REPORTING_ENABLED = context.getResources().getBoolean(id);
             }
             if ((id = getBoolResId(context, "spectrum_sample_reporting")) != 0) {
                 Configuration.SAMPLE_REPORTING = context.getResources().getBoolean(id);
@@ -236,6 +247,9 @@ public class Spectrum {
         if (activity instanceof FragmentActivity) {
             final FragmentManager fragmentManager = ((FragmentActivity) activity).getSupportFragmentManager();
             fragmentManager.registerFragmentLifecycleCallbacks(new FragmentObserver(), true);
+        }
+        if (Configuration.GESTURE_REPORTING_ENABLED) {
+            inflateGestureDetectorSurface(activity);
         }
     }
 
@@ -642,6 +656,18 @@ public class Spectrum {
         return (id & 0xFF000000) == 0 && (id & 0x00FFFFFF) != 0;
     }
 
+    private static int dp2px(@NonNull Context context, float dp) {
+        return Math.round(TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_DIP, dp, context.getResources().getDisplayMetrics()
+        ));
+    }
+
+    private static float distance(float x0, float y0, float x1, float y1) {
+        final float dx = x0 - x1;
+        final float dy = y0 - y1;
+        return (float) Math.sqrt(dx * dx + dy * dy);
+    }
+
     // endregion
 
     // region Recycle Utils
@@ -971,6 +997,76 @@ public class Spectrum {
             messageBytes = 0;
         }
 
+    }
+
+    // endregion
+
+    // region Report Gesture Detector
+
+    private static void inflateGestureDetectorSurface(@NonNull Activity activity) {
+        final View decorView = activity.getWindow().getDecorView();
+        if (decorView instanceof ViewGroup) {
+            final View surface = new ReportGestureSurface(activity);
+            final ViewGroup.LayoutParams lp = new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT
+            );
+            ((ViewGroup) decorView).addView(surface, -1, lp);
+        }
+    }
+
+    private static class ReportGestureSurface extends ViewGroup {
+
+        private static final long SEQUENTIAL_TAP_THRESHOLD_MS = 500;
+        private static final float CONTINUE_DETECTION_RADIUS_DP = 30;
+        private final float continueDetectionRadius = dp2px(getContext(), CONTINUE_DETECTION_RADIUS_DP);
+
+        // Last tap info
+        private float lastTapX;
+        private float lastTapY;
+        private long lastTapTime;
+
+        // Sequential taps detected
+        private int taps = 0;
+
+        ReportGestureSurface(@NonNull Context context) {
+            super(context);
+        }
+
+        @Override
+        protected void onLayout(boolean changed, int l, int t, int r, int b) {
+            // no-child to layout
+        }
+
+        @Override
+        public boolean onInterceptTouchEvent(@NonNull MotionEvent event) {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                if (detectDoubleTap(event)) {
+                    taps = 0;
+                    report();
+                }
+            }
+            return super.onInterceptTouchEvent(event);
+        }
+
+        private boolean detectDoubleTap(@NonNull MotionEvent event) {
+            final long prevTapTime = lastTapTime;
+            lastTapTime = System.currentTimeMillis();
+            final float prevTapX = lastTapX;
+            lastTapX = event.getRawX();
+            final float prevTapY = lastTapY;
+            lastTapY = event.getRawY();
+            if (taps == 0) {
+                taps++;
+                return false;
+            }
+            if (lastTapTime - prevTapTime <= SEQUENTIAL_TAP_THRESHOLD_MS) {
+                if (distance(prevTapX, prevTapY, lastTapX, lastTapY) <= continueDetectionRadius) {
+                    return ++taps >= 2;
+                }
+            }
+            taps = taps == 0 ? ++taps : 0;
+            return false;
+        }
     }
 
     // endregion

@@ -8,4 +8,5 @@
     <bool name="spectrum_append_view_location">true</bool>
     <bool name="spectrum_auto_reporting">false</bool>
     <bool name="spectrum_sample_reporting">false</bool>
+    <bool name="spectrum_gesture_reporting">true</bool>
 </resources>

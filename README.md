@@ -152,8 +152,16 @@ Complete list of configuration options:
     * <i><b>xml:</b></i>&nbsp;&nbsp;&nbsp;\<bool name="`spectrum_auto_reporting`">...\</bool>
 
     * <i><b>default:</b></i>&nbsp;&nbsp;&nbsp;True
+    
+8. Gesture reporting - whether to trigger building report when user double taps:
 
-8. Sample reporting - whether to sample reporting or build new report after any changes:
+    * <i><b>java:</b></i>&nbsp;&nbsp;&nbsp;gestureReporting(`boolean` enable);
+
+    * <i><b>xml:</b></i>&nbsp;&nbsp;&nbsp;\<bool name="`spectrum_gesture_reporting`">...\</bool>
+
+    * <i><b>default:</b></i>&nbsp;&nbsp;&nbsp;True
+
+9. Sample reporting - whether to sample reporting or build new report after any changes:
 
     * <i><b>java:</b></i>&nbsp;&nbsp;&nbsp;sampleReporting(`boolean` sample);
 
