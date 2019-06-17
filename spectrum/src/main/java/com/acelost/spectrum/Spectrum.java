@@ -17,6 +17,7 @@ import java.util.*;
 
 import android.util.TypedValue;
 import android.view.*;
+import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
@@ -211,6 +212,7 @@ public class Spectrum {
     /**
      * Start monitoring of application.
      */
+    @MainThread
     public static void explore(@NonNull Application application) {
         if (!prepare(application)) return;
         final Application observing = applicationRef != null ? applicationRef.get() : null;
@@ -229,6 +231,7 @@ public class Spectrum {
     /**
      * Start monitoring of activity.
      */
+    @MainThread
     public static void explore(@NonNull Activity activity) {
         if (!prepare(activity)) return;
         if (activities.containsKey(activity)) return;
@@ -268,22 +271,18 @@ public class Spectrum {
             return false;
         }
         if (!initialized) {
-            synchronized (Spectrum.class) {
-                if (!initialized) {
-                    activities = new WeakHashMap<>();
-                    activityObservers = new ArrayList<>();
-                    handler = new Handler(Looper.getMainLooper());
-                    pendingChanges = new ArrayList<>();
-                    reportRunnable = new Runnable() {
-                        @Override
-                        public void run() {
-                            report();
-                        }
-                    };
-                    Configuration.parseConfigFromResources(context);
-                    initialized = true;
+            activities = new WeakHashMap<>();
+            activityObservers = new ArrayList<>();
+            handler = new Handler(Looper.getMainLooper());
+            pendingChanges = new ArrayList<>();
+            reportRunnable = new Runnable() {
+                @Override
+                public void run() {
+                    report();
                 }
-            }
+            };
+            Configuration.parseConfigFromResources(context);
+            initialized = true;
         }
         return true;
     }
