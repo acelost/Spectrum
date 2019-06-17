@@ -6,7 +6,7 @@ import com.acelost.spectrum.Spectrum
 class SpectrumApp : Application() {
 
     override fun onCreate() {
-        Spectrum.explore(this)
+        //Spectrum.explore(this)
         super.onCreate()
     }
 

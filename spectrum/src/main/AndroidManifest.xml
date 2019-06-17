@@ -1,2 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.acelost.spectrum" />
+    package="com.acelost.spectrum">
+    
+    <application>
+        <provider
+            android:name=".SpectrumInitProvider"
+            android:authorities="com.acelost.spectrum.SpectrumInitProvider"
+            android:exported="false"
+            android:enabled="@bool/spectrum_auto_init" />
+    </application>
+    
+</manifest>

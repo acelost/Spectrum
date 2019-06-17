@@ -39,6 +39,10 @@ public void onCreate() {
 }
 ```
 
+**Important:** If you imported Spectrum as gradle dependency the code above is redundant.
+By default Spectrum is initializing automatically through content provider.
+You can set boolean resource `spectrum_auto_init` to `false` if you want to disable this behavior.
+
 Now you will see something like this in IDE logcat:
 
 ![](spectrum_logcat_output_example.png)
