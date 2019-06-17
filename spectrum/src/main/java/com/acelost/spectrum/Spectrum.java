@@ -17,6 +17,7 @@ import java.util.*;
 
 import android.util.TypedValue;
 import android.view.*;
+import android.widget.TextView;
 import androidx.annotation.MainThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -201,6 +202,8 @@ public class Spectrum {
 
     private static List<ActivityObserver> activityObservers;
 
+    private static List<ViewInspector> viewInspectors;
+
     private static Handler handler;
 
     private static List<String> pendingChanges;
@@ -273,6 +276,8 @@ public class Spectrum {
         if (!initialized) {
             activities = new WeakHashMap<>();
             activityObservers = new ArrayList<>();
+            viewInspectors = new ArrayList<>();
+            register(new TextViewInspector());
             handler = new Handler(Looper.getMainLooper());
             pendingChanges = new ArrayList<>();
             reportRunnable = new Runnable() {
@@ -334,6 +339,14 @@ public class Spectrum {
                 report();
             }
         }
+    }
+
+    // endregion
+
+    // region Register interceptors
+
+    public static void register(@NonNull ViewInspector inspector) {
+        viewInspectors.add(inspector);
     }
 
     // endregion
@@ -401,6 +414,14 @@ public class Spectrum {
                         ? visibility == View.VISIBLE ? "▸[ViewGroup] " : "▹[ViewGroup]"
                         : visibility == View.VISIBLE ? "●[View] " : "○[View] ")
                 .append(formatClassLink(view));
+
+        final int size = viewInspectors.size();
+        for (int i = size - 1; i > -1; i--) {
+            final ViewInspector inspector = viewInspectors.get(i);
+            if (inspector.canInspect(view)) {
+                inspector.inspect(view, output);
+            }
+        }
 
         if (Configuration.APPEND_VIEW_ID) {
             final int id = view.getId();
@@ -726,6 +747,40 @@ public class Spectrum {
 
     // endregion
 
+    // region Inspection Interceptors
+
+    public interface ViewInspector {
+
+        boolean canInspect(@NonNull View view);
+
+        void inspect(@NonNull View view, @NonNull OutputBuilder output);
+    }
+
+    private static class TextViewInspector implements ViewInspector {
+
+        @Override
+        public boolean canInspect(@NonNull View view) {
+            return view instanceof TextView;
+        }
+
+        @Override
+        public void inspect(@NonNull View view, @NonNull OutputBuilder output) {
+            if (view instanceof TextView) {
+                final TextView tv = (TextView) view;
+                final CharSequence charSequence = tv.getText();
+                if (charSequence != null) {
+                    String text = charSequence.toString();
+                    if (text.length() > 40) {
+                        text = text.substring(38).concat("…");
+                    }
+                    output.append(" \"").append(text).append("\"");
+                }
+            }
+        }
+    }
+
+    // endregion
+
     // region Entity Observers
 
     private static class ApplicationObserver implements Application.ActivityLifecycleCallbacks {
@@ -947,7 +1002,7 @@ public class Spectrum {
 
     // region Output Builder
 
-    private static class OutputBuilder {
+    public static class OutputBuilder {
 
         private final List<StringBuilder> messages = new ArrayList<>();
         private final List<String> line = new ArrayList<>();

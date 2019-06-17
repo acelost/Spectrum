@@ -172,6 +172,34 @@ Complete list of configuration options:
     * <i><b>xml:</b></i>&nbsp;&nbsp;&nbsp;\<bool name="`spectrum_sample_reporting`">...\</bool>
 
     * <i><b>default:</b></i>&nbsp;&nbsp;&nbsp;True
+    
+Also you can set custom inspectors for certain types of view:
+
+```java
+public class MyApplication extends Application {
+    @Override
+    public void onCreate() {
+        Spectrum.register(
+                new Spectrum.ViewInspector() {
+                    @Override
+                    public boolean canInspect(@NonNull View view) {
+                        return view instanceof SwitchCompat;
+                    }
+
+                    @Override
+                    public void inspect(@NonNull View view, @NonNull Spectrum.OutputBuilder output) {
+                        if (view instanceof SwitchCompat) {
+                            final SwitchCompat switchCompat = (SwitchCompat) view;
+                            if (switchCompat.isChecked()) {
+                                output.append(" [checked]");
+                            }
+                        }
+                    }
+                }
+        );
+    }
+}
+```
 
 ## F.A.Q.
  TODO
