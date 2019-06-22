@@ -269,10 +269,6 @@ public class Spectrum {
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private static boolean prepare(@NonNull Context context) {
-        if (!BuildConfig.DEBUG) {
-            // Disable spectrum for release builds
-            return false;
-        }
         if (!initialized) {
             activities = new WeakHashMap<>();
             activityObservers = new ArrayList<>();
